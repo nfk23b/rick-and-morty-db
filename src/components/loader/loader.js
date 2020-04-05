@@ -5,6 +5,7 @@ import { Box } from "@material-ui/core";
 const useStyles = makeStyles({
     loadingContainer: {
         margin: '0 auto',
+        maxWidth: '500px'
     },
     loading: {
         display: 'block',
