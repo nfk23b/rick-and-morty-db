@@ -1,49 +1,34 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Layout from "../components/layout/layout.js";
-import { Container } from "@material-ui/core";
-import LocationsList from '../components/locations-list';
-import { useQuery } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
-import Loader from '../components/loader/loader';
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Layout from '../components/layout/layout.js';
+import { Container, Box } from '@material-ui/core';
+import LocationsList from '../components/locations/locations-list';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        width: "100%",
+        width: '100%',
         flexGrow: 1,
-        maxWidth: "100%",
-        padding: theme.spacing(1.25, 1)
+        maxWidth: '100%',
+        padding: theme.spacing(1.25, 1),
+        margin: '0 auto',
+        [theme.breakpoints.up('md')]: {
+            maxWidth: '960px',
+        }
+    },
+    btn: {
+        backgroundColor: 'red'
     }
 }));
 
-const LOCATIONS = gql`
-    {
-        locations {
-            results {
-                id
-                name
-                type
-                residents {
-                    id
-                    image
-                }
-            }
-        }
-    }
-`;
-
 const Home = () => {
     const classes = useStyles();
-    const { loading, data } = useQuery(LOCATIONS);
 
     return (
         <Layout>
             <Container className={classes.root}>
-                    {loading ? (
-                        <Loader />
-                    ) : (
-                        <LocationsList data={data}/>
-                    )}
+                <Box>
+                    <LocationsList />
+                </Box>
             </Container>
         </Layout>
     );

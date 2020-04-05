@@ -1,18 +1,17 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
+import { CHARACTERS } from "../../helpers/graphql";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Box, Typography } from "@material-ui/core";
 import Link from "next/link";
-import locationImage from "../helpers/location-helper";
 
 const useStyles = makeStyles(theme => ({
     gridItem: {
         display: "flex",
         paddingLeft: 0,
         marginBottom: theme.spacing(1),
-        [theme.breakpoints.up("md")]: {
+        [theme.breakpoints.up("sm")]: {
             "&:nth-child(odd)": {
                 paddingRight: "4px"
             },
@@ -28,11 +27,14 @@ const useStyles = makeStyles(theme => ({
         position: "relative"
     },
     imgContainer: {
-        width: "40%"
+        width: "40%",
+        minHeight: '140px'
     },
     img: {
         display: "block",
-        width: "100%"
+        width: "100%",
+        height: '100%',
+        objectFit: 'cover'
     },
     residentName: {
         color: theme.palette.common.white,
@@ -59,33 +61,15 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const LOCATION = gql`
-    query Location($id: ID!) {
-        location(id: $id) {
-            id
-            name
-            type
-            residents {
-                id
-                name
-                image
-                location {
-                    name
-                }
-                species
-            }
-        }
-    }
-`;
-
 const ResidentsList = () => {
     const router = useRouter();
     const classes = useStyles();
     const id = router.query.id;
     
-    const { loading, data } = useQuery(LOCATION, {
+    const { loading, data } = useQuery(CHARACTERS, {
         variables: { id }
     });
+    
     return (
         <Box>
             {!loading && data !== undefined && data.location.residents &&
@@ -93,10 +77,10 @@ const ResidentsList = () => {
                     Residents
                 </Typography>
             }
-            <Grid container spacing={0} className={classes.grid}>
+            <Grid container spacing={0} >
                 {!loading && data !== undefined && data.location.residents && data.location.residents.map(
                     ({ id, name, image, species, location }) => (
-                        <Grid item xs={12} md={6} key={id} className={classes.gridItem} >
+                        <Grid item xs={12} sm={6} key={id} className={classes.gridItem} >
                             <Link href="/residents/[id]" as={`/residents/${id}`}>
                                 <a className={classes.imgContainer}>
                                     <img src={image} className={classes.img} />

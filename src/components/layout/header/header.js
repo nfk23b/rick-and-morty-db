@@ -6,10 +6,10 @@ const useStyles = makeStyles(theme => ({
         width: "100%",
         display: 'flex',
         justifyContent: 'center',
-        backgroundColor: theme.palette.common.black
     },
     link: {
-        outline: 'none'
+        outline: 'none',
+        backgroundColor: theme.palette.common.black
     },
     img: {
         display: 'block',

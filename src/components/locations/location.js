@@ -1,24 +1,30 @@
+import { useState, useEffect  } from "react";
 import { useRouter } from "next/router";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography } from "@material-ui/core";
 import { useQuery } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
-import locationImage from "../helpers/location-helper";
-import backBtn from "../images/back.svg";
+import { LOCATION } from "../../helpers/graphql";
+import locationImage from "../../helpers/location-image";
+import backBtn from "../../images/back.svg";
 import Link from "next/link";
+import Loader from '../../components/loader/loader';
 
 const useStyles = makeStyles(theme => ({
     wrapper: {
-        maxWidth: "960px",
+        maxWidth: '100%',
         margin: "0 auto",
-        position: 'relative'
+        position: 'relative',
+        [theme.breakpoints.up('md')]: {
+            maxWidth: "960px",
+        }
     },
     dataContainer: {
         marginTop: theme.spacing(2.25),
     },
     backBtn: {
         position: 'absolute',
-        left: theme.spacing(0.5)
+        left: theme.spacing(0.5),
+        zIndex: 1
     },
     mainImg: {
         display: "block",
@@ -48,35 +54,27 @@ const useStyles = makeStyles(theme => ({
     },
     }));
 
-const LOCATION = gql`
-    query Location($id: ID!) {
-        location(id: $id) {
-            id
-            name
-            type
-        }
-    }
-`;
-
 const Location = () => {
     const router = useRouter();
     const classes = useStyles();
     const id = router.query.id;
-
+    
     const { loading, data } = useQuery(LOCATION, {
         variables: { id }
     });
 
     return (
         <Box >
+            <Link href="/" as={`/`} >
+                <a className={classes.backBtn}>
+                    <img src={backBtn} />
+                </a>
+            </Link>
             {!loading ? (
                 <Box className={classes.wrapper}>
-                    <Link href="/" as={`/`} >
-                        <a className={classes.backBtn}>
-                            <img src={backBtn} />
-                        </a>
-                    </Link>
-                    <img src={locationImage(data.location.type)} className={classes.mainImg}/>
+                    <Box >
+                        <img src={locationImage(data.location.type)} className={classes.mainImg} />
+                    </Box>
                     <Box className={classes.dataContainer}>
                         <Typography variant="h3" className={classes.planetName}>
                             {data.location.name}
@@ -86,7 +84,7 @@ const Location = () => {
                         </Typography>
                     </Box>
                 </Box>
-            ) : null } 
+            ) : <Loader /> } 
         </Box>
     );
 };

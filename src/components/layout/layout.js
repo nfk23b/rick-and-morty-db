@@ -10,13 +10,13 @@ const useStyles = makeStyles({
         height: '100%',
         margin: '0 auto',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        backgroundImage: `url(${bg})`,
+        backgroundColor: 'black',
     },
     wrapper: {
         display: 'flex',
         flexGrow: 1,
-        backgroundImage: `url(${bg})`,
-        backgroundColor: 'black',
     }
 });
 

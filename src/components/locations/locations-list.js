@@ -2,8 +2,11 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Box, Typography } from "@material-ui/core";
 import Link from 'next/link'
-import locationImage from "../helpers/location-helper";
-import Loader from '../components/loader/loader';
+import locationImage from "../../helpers/location-image";
+import Loader from '../loader/loader';
+import { Waypoint } from 'react-waypoint';
+import { useQuery } from '@apollo/react-hooks';
+import { LOCATIONS } from '../../helpers/graphql';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -12,15 +15,11 @@ const useStyles = makeStyles(theme => ({
         maxWidth: "100%",
         padding: theme.spacing(1.25, 1)
     },
-    grid: {
-        maxWidth: "960px",
-        margin: '0 auto'
-    },
     gridItem: {
         display: "flex",
         paddingLeft: 0,
         marginBottom: theme.spacing(0.625),
-        [theme.breakpoints.up('md')]: {
+        [theme.breakpoints.up('sm')]: {
             '&:nth-child(odd)': {
                 paddingRight: '2.5px'
             },
@@ -31,13 +30,16 @@ const useStyles = makeStyles(theme => ({
     },
     imgContainer: {
       width: '100%',
-      maxWidth: '37%'
+      maxWidth: '37%',
+      minHeight: '140px'
     },
     img: {
-      display: 'block',
-      width: '100%'
+        display: 'block',
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover'
     },
-    description: {
+    descriptionContainer: {
         backgroundColor: theme.palette.locations,
         width: '100%',
         padding: theme.spacing(2, 2, 1.6),
@@ -60,30 +62,69 @@ const useStyles = makeStyles(theme => ({
     },
     residentsContainer: {
         display: "flex",
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         maxWidth: '76%',
         position: 'absolute',
         bottom: '12px'
     },
     residentImg: {
-        maxWidth: '26%'
+        maxWidth: '26%',
+        marginRight: '11%',
+        '&:last-child': {
+            marginRight: 0
+        }
     }
 }));
 
-const LocationsList = ({ data }) => {
+const LocationsList = () => {
     const classes = useStyles();
 
+    const { data, fetchMore, networkStatus } = useQuery(LOCATIONS, {
+        notifyOnNetworkStatusChange: true
+    });
+
     return (
-        <Grid container spacing={0} className={classes.grid}>
-            {data.locations.results.map(
-                ({ id, name, type, residents }) => (
-                    <Grid item xs={12} md={6} key={name} className={classes.gridItem} >
+        <Grid container spacing={0}>
+            {data !== undefined && data.locations.results
+            .map(
+                ({ id, name, type, residents }, i) => (
+                    <Grid item xs={12} sm={6} key={id} className={classes.gridItem} >
+                        {data.locations.info.next && i === data.locations.results.length - 2 &&
+                            <Waypoint
+                            onEnter={() =>
+                              fetchMore({
+                                variables: {
+                                  page: data.locations.info.next
+                                },
+                                updateQuery: (pv, { fetchMoreResult }) => {
+                                  if (!fetchMoreResult) {
+                                    return pv;
+                                  }
+        
+                                  return {
+                                    locations: {
+                                      __typename: "Locations",
+                                      results: [
+                                            ...pv.locations.results,
+                                            ...fetchMoreResult.locations.results
+                                      ],
+                                      info: {
+                                            __typename: "Info",
+                                            next: fetchMoreResult.locations.info.next
+                                      }
+                                    }
+                                  };
+                                }
+                              })
+                            }
+                          />
+                        }
                         <Link href="/locations/[id]" as={`/locations/${id}`}>
                             <a className={classes.imgContainer}>
                                 <img src={locationImage(type)} className={classes.img} />
                             </a>
                         </Link>
-                        <Box className={classes.description}>
+                        <Box className={classes.descriptionContainer}>
                             <Typography className={classes.planetName} component="h3">
                                 <Link href="/locations/[id]" as={`/locations/${id}`}>
                                     <a className={classes.planetName}>{name}</a>
@@ -104,8 +145,9 @@ const LocationsList = ({ data }) => {
                         </Box>
                     </Grid>
                 )
-            )}
-        </Grid>
+                )}
+            {(networkStatus === 3 || networkStatus === 1)&& <Loader />}
+            </Grid>
     )
 }
 
