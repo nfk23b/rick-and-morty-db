@@ -22,7 +22,8 @@
         "react": "16.13.1",
         "react-dom": "16.13.1",
         "react-waypoint": "^9.0.2",
-        "styled-components": "^5.0.1"
+        "styled-components": "^5.0.1",
+        "use-ssr": "^1.0.23"
     },
     "devDependencies": {
         "babel-plugin-styled-components": "^1.10.7"
