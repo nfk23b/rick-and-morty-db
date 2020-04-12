@@ -1,0 +1,1 @@
+self.__BUILD_MANIFEST = (function(a){return {"/":[a],"/index":[a],"/rick-and-morty-db/locations/[id]":[a],"/rick-and-morty-db/residents/[id]":[a]}}("static\u002Fchunks\u002F5078754774e041e3db7130b871d77b8cca0e02f7.d2a1012bc15cefe29aee.js"));self.__BUILD_MANIFEST_CB && self.__BUILD_MANIFEST_CB()
